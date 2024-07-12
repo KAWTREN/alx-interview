@@ -1,59 +1,49 @@
 #!/usr/bin/python3
-"""doc doc doc"""
+"""
+The N queens puzzle is the challenge of placing N non-attacking queens
+"""
 import sys
 
 
-def solve_queens_problem(board_size):
-    """doc doc doc"""
+def solveNQueens(N):
+    """Solve N queens"""
+    col = []
+    post_diag = []  # row + col
+    neg_diag = []  # row - col
+    res = []
 
-    def is_valid_position(pos, occupied_pos):
-        """doc doc doc"""
-        for i in range(len(occupied_pos)):
-            if (
-                occupied_pos[i] == pos or
-                occupied_pos[i] - i == pos - len(occupied_pos) or
-                occupied_pos[i] + i == pos + len(occupied_pos)
-            ):
-                return False
-        return True
-
-    def place_queens(board_size, index, occupied_pos, solutions):
-        """doc doc doc"""
-        if index == board_size:
-            solutions.append(occupied_pos[:])
+    def solve(row):
+        """Solve"""
+        if row == N:
+            res.append([[i, col[i]] for i in range(N)])
             return
+        for i in range(N):
+            if (i not in col and row + i
+                    not in post_diag and row - i not in neg_diag):
+                col.append(i)
+                post_diag.append(row + i)
+                neg_diag.append(row - i)
+                solve(row + 1)
+                col.pop()
+                post_diag.pop()
+                neg_diag.pop()
 
-        for i in range(board_size):
-            if is_valid_position(i, occupied_pos):
-                occupied_pos.append(i)
-                place_queens(board_size, index + 1, occupied_pos, solutions)
-                occupied_pos.pop()
-
-    solutions = []
-    place_queens(board_size, 0, [], solutions)
-    return solutions
-
-
-def main():
-    """doc doc doc"""
-    if len(sys.argv) != 2:
-        print("Usage: nqueens N")
-        sys.exit(1)
-
-    try:
-        board_size = int(sys.argv[1])
-    except ValueError:
-        print("N must be a number")
-        sys.exit(1)
-
-    if board_size < 4:
-        print("N must be at least 4")
-        sys.exit(1)
-
-    solutions = solve_queens_problem(board_size)
-    for solution in solutions:
-        print([[i, solution[i]] for i in range(len(solution))])
+    solve(0)
+    return res
 
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) != 2:
+        print("Usage: nqueens N")
+        sys.exit(1)
+    if not sys.argv[1].isdigit():
+        print("N must be a number")
+        sys.exit(1)
+    if int(sys.argv[1]) < 4:
+        print("N must be at least 4")
+        sys.exit(1)
+    N = int(sys.argv[1])
+
+    res = solveNQueens(N)
+    for i in res:
+        print(i)
