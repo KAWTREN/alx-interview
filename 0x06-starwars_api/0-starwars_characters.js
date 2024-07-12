@@ -1,44 +1,18 @@
 #!/usr/bin/node
-// Write a script that prints all characters of a Star Wars movie:
+
 const request = require('request');
-const movieID = process.argv[2];
-const getCharacters = new Promise((resolve, reject) => {
-  request.get(
-    `https://swapi-api.alx-tools.com/api/films/${movieID}/`,
-    (err, response, body) => {
-      if (!err) {
-        try {
-          resolve(JSON.parse(body).characters);
-        } catch (error) {
-          reject(error);
-        }
-      }
-      reject(err);
-    }
-  );
-});
+const url = `https://swapi-api.alx-tools.com/api/films/${process.argv[2]}/`;
 
-getCharacters.then((characters) => {
-  const charactersPromises = [];
-
-  for (const character of characters) {
-    charactersPromises.push(
-      new Promise((resolve, reject) => {
-        request.get(character, (err, response, body) => {
-          if (err) reject(err);
-          try {
-            resolve(JSON.parse(body).name);
-          } catch (error) {
-            reject(error);
-          }
-        });
-      })
-    );
+request(url, (err, res, body) => {
+  if (err) console.log(err);
+  const data = JSON.parse(body);
+  const characters = data.characters;
+  for (let i = 0; i < characters.length; i++) {
+    const url = characters[i];
+    request(url, (err, res, body) => {
+      if (err) console.log(err);
+      const data = JSON.parse(body);
+      console.log(data.name);
+    });
   }
-
-  Promise.all(charactersPromises).then((names) => {
-    for (const name of names) {
-      console.log(name);
-    }
-  });
 });
